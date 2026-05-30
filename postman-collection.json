@@ -1,0 +1,281 @@
+{
+  "info": {
+    "name": "Booking System API",
+    "description": "Global Class Offering Booking System — complete API collection",
+    "_postman_id": "booking-api-v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "teacherToken", "value": "" },
+    { "key": "parentToken", "value": "" },
+    { "key": "courseId", "value": "" },
+    { "key": "offeringId", "value": "" },
+    { "key": "bookingId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Teacher",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/v1/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alice Smith\",\n  \"email\": \"alice@teacher.com\",\n  \"password\": \"password123\",\n  \"role\": \"TEACHER\",\n  \"timezone\": \"America/New_York\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.collectionVariables.set('teacherToken', pm.response.json().token);"] }
+          }]
+        },
+        {
+          "name": "Register Parent",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/v1/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bob Sharma\",\n  \"email\": \"bob@parent.com\",\n  \"password\": \"password123\",\n  \"role\": \"PARENT\",\n  \"timezone\": \"Asia/Kolkata\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.collectionVariables.set('parentToken', pm.response.json().token);"] }
+          }]
+        },
+        {
+          "name": "Login Teacher",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alice@teacher.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.collectionVariables.set('teacherToken', pm.response.json().token);"] }
+          }]
+        },
+        {
+          "name": "Login Parent",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"bob@parent.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.collectionVariables.set('parentToken', pm.response.json().token);"] }
+          }]
+        }
+      ]
+    },
+    {
+      "name": "Teacher - Courses",
+      "item": [
+        {
+          "name": "Create Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{teacherToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/v1/teachers/courses",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Minecraft Coding\",\n  \"description\": \"Learn coding through Minecraft\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.collectionVariables.set('courseId', pm.response.json().id);"] }
+          }]
+        },
+        {
+          "name": "Get My Courses",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{teacherToken}}" }],
+            "url": "{{baseUrl}}/api/v1/teachers/courses"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Teacher - Offerings",
+      "item": [
+        {
+          "name": "Create Offering",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{teacherToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/v1/teachers/offerings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseId\": \"{{courseId}}\",\n  \"title\": \"Saturday Batch\",\n  \"description\": \"8-week Saturday course\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.collectionVariables.set('offeringId', pm.response.json().id);"] }
+          }]
+        },
+        {
+          "name": "Add Sessions (batch)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{teacherToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/v1/teachers/offerings/{{offeringId}}/sessions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessions\": [\n    { \"startTime\": \"2025-06-07T18:00:00\", \"endTime\": \"2025-06-07T19:00:00\" },\n    { \"startTime\": \"2025-06-14T18:00:00\", \"endTime\": \"2025-06-14T19:00:00\" },\n    { \"startTime\": \"2025-06-21T18:00:00\", \"endTime\": \"2025-06-21T19:00:00\" }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get My Offerings",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{teacherToken}}" }],
+            "url": "{{baseUrl}}/api/v1/teachers/offerings"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Parent - Browse & Book",
+      "item": [
+        {
+          "name": "Browse Available Offerings",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{parentToken}}" }],
+            "url": "{{baseUrl}}/api/v1/parents/offerings"
+          }
+        },
+        {
+          "name": "Book Offering",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{parentToken}}" }],
+            "url": "{{baseUrl}}/api/v1/parents/bookings/{{offeringId}}"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["if(pm.response.json().id) pm.collectionVariables.set('bookingId', pm.response.json().id);"] }
+          }]
+        },
+        {
+          "name": "Book Same Offering Again (expect 409)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{parentToken}}" }],
+            "url": "{{baseUrl}}/api/v1/parents/bookings/{{offeringId}}"
+          }
+        },
+        {
+          "name": "Get My Bookings",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{parentToken}}" }],
+            "url": "{{baseUrl}}/api/v1/parents/bookings"
+          }
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{parentToken}}" }],
+            "url": "{{baseUrl}}/api/v1/parents/bookings/{{bookingId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Conflict Detection Demo",
+      "item": [
+        {
+          "name": "Create Conflicting Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{teacherToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/v1/teachers/courses",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Roblox Game Design\",\n  \"description\": \"Overlapping schedule test\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.collectionVariables.set('courseId2', pm.response.json().id);"] }
+          }]
+        },
+        {
+          "name": "Create Conflicting Offering",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{teacherToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/v1/teachers/offerings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseId\": \"{{courseId2}}\",\n  \"title\": \"Overlapping Batch\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.collectionVariables.set('offeringId2', pm.response.json().id);"] }
+          }]
+        },
+        {
+          "name": "Add Overlapping Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{teacherToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/v1/teachers/offerings/{{offeringId2}}/sessions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessions\": [\n    { \"startTime\": \"2025-06-14T17:30:00\", \"endTime\": \"2025-06-14T18:30:00\" }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Book Conflicting Offering (expect 409)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{parentToken}}" }],
+            "url": "{{baseUrl}}/api/v1/parents/bookings/{{offeringId2}}"
+          }
+        }
+      ]
+    }
+  ]
+}
